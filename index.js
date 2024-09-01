@@ -5,6 +5,7 @@ import gradient from "gradient-string";
 import chalkAnimation from "chalk-animation";
 import figlet from "figlet";
 import { createSpinner } from "nanospinner";
+import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 
@@ -71,4 +72,32 @@ function addTask(description) {
   saveTasks(tasks);
 
   console.log("Tarea agregada: ", description);
+}
+
+// Actualizar una tarea existente
+function updateTask(id, newDescription) {
+  const tasks = loadTasks();
+  const task = tasks.find((task) => task.id === parseInt(id));
+
+  if (task) {
+    task.description = newDescription;
+    saveTasks(tasks);
+    console.log("Tarea actualizada: ", newDescription);
+  } else {
+    console.log("Tarea no encontrada");
+  }
+}
+
+// Eliminar tarea
+function deleteTask(id) {
+  let tasks = loadTasks();
+  const initialLength = tasks.length;
+  tasks = tasks.filter((task) => task.id !== parseInt(id));
+
+  if (tasks.length < initialLength) {
+    saveTasks(tasks);
+    console.log("Tarea eliminada");
+  } else {
+    console.log("Tarea no encontrada");
+  }
 }
