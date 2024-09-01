@@ -123,14 +123,31 @@ function changeStatus(id, status) {
   }
 }
 
-// Listar todas las tareas
+// Listar todas las tareas con colores según su estado
 function listTasks(filter = null) {
   const tasks = loadTasks();
   tasks.forEach((task) => {
     if (!filter || task.status === filter) {
-      console.log(`[${task.status}] ${task.id}: ${task.description}`);
+      const colorFunc = getStatusColor(task.status);
+      console.log(
+        colorFunc(`[${task.status}] ${task.id}: ${task.description}`)
+      );
     }
   });
+}
+
+// Obtener el color según el estado
+function getStatusColor(status) {
+  switch (status) {
+    case "completada":
+      return chalk.green;
+    case "en progreso":
+      return chalk.blue;
+    case "pendiente":
+      return chalk.yellow;
+    default:
+      return chalk.white;
+  }
 }
 
 // Menú principal usando inquirer con submenús
@@ -155,6 +172,7 @@ function mainMenu() {
         case "Salir":
           console.log("¡Hasta luego!");
           process.exit();
+          break;
         default:
           console.log("Acción no reconocida.");
           mainMenu();
@@ -163,8 +181,9 @@ function mainMenu() {
     });
 }
 
-// Submenú para gestionar tareas
+// Submenú para gestionar tareas con visualización de tareas y sus IDs
 function manageTasksMenu() {
+  listTasks(); // Mostrar todas las tareas con sus IDs y colores
   inquirer
     .prompt([
       {
@@ -198,6 +217,7 @@ function manageTasksMenu() {
             });
           break;
         case "Actualizar tarea":
+          listTasks(); // Mostrar las tareas nuevamente antes de solicitar el ID
           inquirer
             .prompt([
               {
@@ -217,6 +237,7 @@ function manageTasksMenu() {
             });
           break;
         case "Eliminar tarea":
+          listTasks(); // Mostrar las tareas nuevamente antes de solicitar el ID
           inquirer
             .prompt([
               {
@@ -231,6 +252,7 @@ function manageTasksMenu() {
             });
           break;
         case "Marcar tarea como en progreso":
+          listTasks(); // Mostrar las tareas nuevamente antes de solicitar el ID
           inquirer
             .prompt([
               {
@@ -245,6 +267,7 @@ function manageTasksMenu() {
             });
           break;
         case "Marcar tarea como completada":
+          listTasks(); // Mostrar las tareas nuevamente antes de solicitar el ID
           inquirer
             .prompt([
               {
