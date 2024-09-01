@@ -16,7 +16,7 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-console.log(chalk.bgGreen("Hola mama"));
+// console.log(chalk.bgGreen("Hola mama"));
 
 let userName;
 
@@ -133,25 +133,51 @@ function listTasks(filter = null) {
   });
 }
 
-// Menú principal
+// Menú principal usando inquirer con submenús
 function mainMenu() {
   inquirer
     .prompt([
       {
         type: "list",
         name: "action",
-        message: "Que queres hacer?",
+        message: "¿Qué deseas hacer?",
+        choices: ["Gestionar tareas", "Listar tareas", "Salir"],
+      },
+    ])
+    .then((answers) => {
+      switch (answers.action) {
+        case "Gestionar tareas":
+          manageTasksMenu();
+          break;
+        case "Listar tareas":
+          listTasksMenu();
+          break;
+        case "Salir":
+          console.log("¡Hasta luego!");
+          process.exit();
+        default:
+          console.log("Acción no reconocida.");
+          mainMenu();
+          break;
+      }
+    });
+}
+
+// Submenú para gestionar tareas
+function manageTasksMenu() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "action",
+        message: "¿Qué acción deseas realizar?",
         choices: [
           "Agregar tarea",
           "Actualizar tarea",
           "Eliminar tarea",
           "Marcar tarea como en progreso",
           "Marcar tarea como completada",
-          "Listar todas las tareas",
-          "Listar tareas completadas",
-          "Listar tareas pendientes",
-          "Listar tareas en progreso",
-          "Salir",
+          "Volver al menú principal",
         ],
       },
     ])
@@ -163,28 +189,132 @@ function mainMenu() {
               {
                 type: "input",
                 name: "description",
-                message: "Ingresa la descripcion de la tarea:",
+                message: "Ingresa la descripción de la tarea:",
               },
             ])
             .then((answer) => {
               addTask(answer.description);
-              mainMenu();
+              manageTasksMenu();
             });
           break;
-        case "Listar todas las tareas":
-          listTasks();
+        case "Actualizar tarea":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "id",
+                message: "Ingresa el ID de la tarea a actualizar:",
+              },
+              {
+                type: "input",
+                name: "description",
+                message: "Ingresa la nueva descripción de la tarea:",
+              },
+            ])
+            .then((answers) => {
+              updateTask(answers.id, answers.description);
+              manageTasksMenu();
+            });
+          break;
+        case "Eliminar tarea":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "id",
+                message: "Ingresa el ID de la tarea a eliminar:",
+              },
+            ])
+            .then((answer) => {
+              deleteTask(answer.id);
+              manageTasksMenu();
+            });
+          break;
+        case "Marcar tarea como en progreso":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "id",
+                message: "Ingresa el ID de la tarea a marcar como en progreso:",
+              },
+            ])
+            .then((answer) => {
+              changeStatus(answer.id, "en progreso");
+              manageTasksMenu();
+            });
+          break;
+        case "Marcar tarea como completada":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "id",
+                message: "Ingresa el ID de la tarea a marcar como completada:",
+              },
+            ])
+            .then((answer) => {
+              changeStatus(answer.id, "completada");
+              manageTasksMenu();
+            });
+          break;
+        case "Volver al menú principal":
           mainMenu();
           break;
-        case "Salir":
-          console.log("Hasta luego");
-          process.exit();
         default:
           console.log("Acción no reconocida.");
-          mainMenu();
+          manageTasksMenu();
           break;
       }
     });
 }
 
-// Iniciar el programa
+// Submenú para listar tareas
+function listTasksMenu() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "action",
+        message: "¿Qué lista deseas ver?",
+        choices: [
+          "Listar todas las tareas",
+          "Listar tareas completadas",
+          "Listar tareas pendientes",
+          "Listar tareas en progreso",
+          "Volver al menú principal",
+        ],
+      },
+    ])
+    .then((answers) => {
+      switch (answers.action) {
+        case "Listar todas las tareas":
+          listTasks();
+          listTasksMenu();
+          break;
+        case "Listar tareas completadas":
+          listTasks("completada");
+          listTasksMenu();
+          break;
+        case "Listar tareas pendientes":
+          listTasks("pendiente");
+          listTasksMenu();
+          break;
+        case "Listar tareas en progreso":
+          listTasks("en progreso");
+          listTasksMenu();
+          break;
+        case "Volver al menú principal":
+          mainMenu();
+          break;
+        default:
+          console.log("Acción no reconocida.");
+          listTasksMenu();
+          break;
+      }
+    });
+}
+
+// Iniciar el menú principal
+await welcome();
 mainMenu();
