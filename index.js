@@ -9,6 +9,13 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+// Convertir __dirname para módulos ES
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 console.log(chalk.bgGreen("Hola mama"));
 
 let userName;
@@ -125,3 +132,59 @@ function listTasks(filter = null) {
     }
   });
 }
+
+// Menú principal
+function mainMenu() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "action",
+        message: "Que queres hacer?",
+        choices: [
+          "Agregar tarea",
+          "Actualizar tarea",
+          "Eliminar tarea",
+          "Marcar tarea como en progreso",
+          "Marcar tarea como completada",
+          "Listar todas las tareas",
+          "Listar tareas completadas",
+          "Listar tareas pendientes",
+          "Listar tareas en progreso",
+          "Salir",
+        ],
+      },
+    ])
+    .then((answers) => {
+      switch (answers.action) {
+        case "Agregar tarea":
+          inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "description",
+                message: "Ingresa la descripcion de la tarea:",
+              },
+            ])
+            .then((answer) => {
+              addTask(answer.description);
+              mainMenu();
+            });
+          break;
+        case "Listar todas las tareas":
+          listTasks();
+          mainMenu();
+          break;
+        case "Salir":
+          console.log("Hasta luego");
+          process.exit();
+        default:
+          console.log("Acción no reconocida.");
+          mainMenu();
+          break;
+      }
+    });
+}
+
+// Iniciar el programa
+mainMenu();

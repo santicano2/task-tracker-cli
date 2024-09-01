@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "description": "Lavar ropa",
+    "status": "pendiente"
+  },
+  {
+    "id": 2,
+    "description": "Hacer la cama",
+    "status": "pendiente"
+  }
+]
