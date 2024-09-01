@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
 import chalk from "chalk";
-import inquirer from "inquirer";
 import gradient from "gradient-string";
 import chalkAnimation from "chalk-animation";
 import figlet from "figlet";
 import { createSpinner } from "nanospinner";
+import fs from "fs";
+import path from "path";
 
 console.log(chalk.bgGreen("Hola mama"));
 
@@ -31,4 +32,43 @@ async function welcome() {
 		`);
 }
 
-await welcome();
+// Nombre del archivo JSON de tareas
+const TASKS_FILE = path.join(__dirname, "tareas.json");
+
+// Leer el archivo JSON de tareas
+function loadTasks() {
+  if (fs.existsSync(TASKS_FILE)) {
+    const data = fs.readFileSync(TASKS_FILE);
+    return JSON.parse(data);
+  }
+  return [];
+}
+
+// Guardar el archivo JSON de tareas
+function saveTasks(tasks) {
+  fs.writeFileSync(TASKS_FILE, JSON.stringify(tasks, null, 2));
+}
+
+// Obtener el siguiente ID de tarea disponible
+function getNextId(tasks) {
+  if (tasks.length === 0) {
+    return 1;
+  }
+
+  const ids = tasks.map((task) => task.id);
+  return Math.max(...ids) + 1;
+}
+
+// Crear una nueva tarea
+function addTask(description) {
+  const tasks = loadTasks();
+  const newTask = {
+    id: getNextId(tasks),
+    description,
+    status: "pendiente",
+  };
+  tasks.push(newTask);
+  saveTasks(tasks);
+
+  console.log("Tarea agregada: ", description);
+}
