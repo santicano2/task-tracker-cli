@@ -101,3 +101,27 @@ function deleteTask(id) {
     console.log("Tarea no encontrada");
   }
 }
+
+// Cambiar estado de una tarea
+function changeStatus(id, status) {
+  const tasks = loadTasks();
+  const task = tasks.find((task) => task.id === parseInt(id));
+
+  if (task) {
+    task.status = status;
+    saveTasks(tasks);
+    console.log(`Tarea marcada como ${status}`);
+  } else {
+    console.log("Tarea no encontrada");
+  }
+}
+
+// Listar todas las tareas
+function listTasks(filter = null) {
+  const tasks = loadTasks();
+  tasks.forEach((task) => {
+    if (!filter || task.status === filter) {
+      console.log(`[${task.status}] ${task.id}: ${task.description}`);
+    }
+  });
+}
